@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Public Suffix Query Zone</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/styles.css" rel="stylesheet">
+	</head>
+	<body>
+<!-- Wrap all page content here -->
+<div id="wrap">
+  
+  <!-- Fixed navbar -->
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">publicsuffix.zone</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/">Home</a></li>
+          <li><a href="https://github.com/sse-secure-systems/publicsuffix.zone">GitHub</a></li>
+          <li><a href="https://pypi.org/project/psl-dns/">psl-dns (Python)</a></li>
+          <!--li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li class="dropdown-header">Nav header</li>
+              <li><a href="#">Separated link</a></li>
+              <li><a href="#">One more separated link</a></li>
+            </ul>
+          </li-->
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Begin page content -->
+  <div class="container">
+    <div class="page-header">
+      <h1>The PSL Query Service</h1>
+    </div>
+    <blockquote>
+      <p>A "public suffix" is one under which Internet users can (or historically could) directly register names. Some examples of public suffixes are <samp>.com</samp>, <samp>.co.uk</samp> and <samp>pvt.k12.ma.us</samp>. The Public Suffix List is a list of all known public suffixes.</p>
+      <p>The Public Suffix List is an initiative of Mozilla, but is maintained as a community resource.</p>
+      <footer><cite><a href="https://publicsuffix.org/">publicsuffix.org</a></cite></footer>
+    </blockquote>
+    <div style="background: #f8f8f8; border: 2px solid #efefef; border-radius: 4px; margin-bottom: 1em; padding: 1.5em 1em 0.5em">
+      <p class="lead">The service at publicsuffix.zone allows querying the <a href="https://publicsuffix.org/">Public Suffix List</a> (PSL) conveniently via the DNS.
+      <pre class="lead"><kbd>$ export DOMAIN=supertux.<b>github.io</b></kbd>
+<kbd>$ dig +short <b>PTR</b> <b><var>$DOMAIN</var>.query.publicsuffix.zone</b> | tail -n1</kbd>
+<samp><b>github.io.</b></samp></pre>
+      <pre class="lead"><kbd>$ <a href="https://pypi.org/project/psl-dns/">psl-dns_query</a> <b>github.io</b></kbd>
+<samp><b>public</b> github.io</samp></pre>
+      <pre class="lead"><kbd>$ <a href="https://pypi.org/project/psl-dns/">psl-dns_query</a> <b>supertux.github.io</b></kbd>
+<samp><b>private</b> github.io</samp></pre>
+      <p class="lead">Our PSL Query Service <strong>removes the need to parse the PSL</strong> on the application level. Instead, it enables simple lookups to <strong>immediately retrieve public suffix information</strong>.</p>
+    </div>
+
+    <p class="lead">PSL information is required in various contexts, for example for cookie scoping in browsers, for certificate issuance, and for the secure operation of authoritative multi-tenant nameservers. The <a href="https://github.com/publicsuffix/list">list itself</a> is maintained as a text file on GitHub.</p>
+    <p class="lead">Until now, applications requiring information from the PSL were compelled to bring their own copy of the list, parse it, and extract the required information using a multi-staged <a href="https://publicsuffix.org/list/">algorithm</a>. In addition to the implementation and processing effort, applications also had to make sure to keep their local PSL copy up to date.</p>
+    <p class="lead">Our PSL Query Service removes the need for applications to parse or refresh the PSL altogether. Instead, it facilitates <strong>simple lookups to immediately retrieve the public suffix</strong> that is associated with a given name.</p>
+
+    <h2>How it works</h2>
+    <p class="lead">We created the DNS zone <samp>query.publicsuffix.zone</samp>. The public suffix for a <code>$DOMAIN</code> can be retrieved by querying the <samp>PTR</samp> record at <samp><code>$DOMAIN</code>.query.publicsuffix.zone</samp>. The PSL rules are encoded in the zone's records by means of crafty <samp>CNAME</samp> redirects and shrewd wildcard configurations, such that the DNS lookup eventually arrives at a <samp>PTR</samp> record which does indeed point to the public suffix of <code>$DOMAIN</code>.</p>
+    <p class="lead">If <code>$DOMAIN</code> is subject to multiple PSL rules (e.g. it is covered by a wildcard, but an exception is defined), you will find <samp>TXT</samp> records alongside the <samp>PTR</samp> record, representing the PSL rules that were applied but overruled.</p>
+
+    <h2>Libraries</h2>
+    <p class="lead">Instead of querying the PSL zone yourself, you can use libraries to conveniently handle the lookup for you:</p>
+    <ul class="lead">
+      <li>Python: <a href="https://pypi.org/project/psl-dns/">psl-dns</a>, both library and command-line tools</li>
+    </ul>
+
+    <h2>Limitations</h2>
+    <p class="lead">The PSL specification allows for inline wildcards. For example, <samp>public.*.tld</samp> would we a valid PSL rule, signifying that a third-level domain under <samp>tld</samp> whose third-level label is <samp>public</samp> is a public suffix, regardless of the second-level label. Unfortunately, such rules cannot be directly mapped onto the DNS, and any possible workarounds would require auxiliary DNS lookups. As a result, the desired information would not generally be determinable with just one query.</p>
+    <p class="lead">Luckily, the PSL currently does not contain any such pathologic cases as of now, so that this limitation currently is of no consequence. Libraries such as <a href="https://pypi.org/project/psl-dns/">psl-dns</a> handle these cases gracefully, should they ever occur.</p>
+    <p class="lead">Wildcards at the left-most position are supported (such as <samp>*.ck</samp>), including exception rules (such as <samp>www.ck</samp>).</p>
+
+    <h2>Who runs this service?</h2>
+    <p class="lead">The Public Suffix Query Service is provided for free. It is operated by <a href="https://securesystems.de/">SSE</a>, a Berlin-based IT security consultancy. SSE is invested in developing and promoting DNS-related (and other) security services for the public.</p>
+    <p class="lead">The PSL zone <samp>query.publicsuffix.zone</samp> is hosted with <a href="https://desec.io/">deSEC</a>.</p>
+  </div>
+</div>
+
+<div id="footer">
+  <div class="container">
+    <p class="text-muted credit">© 2019 <a href="https://securesystems.de/">SSE - Secure Systems Engineering GmbH</a> | <a href="https://www.securesystems.de/en/impressum.html">Legal Notice</a></p>
+  </div>
+</div>
+
+	<!-- script references -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+	</body>
+</html>
