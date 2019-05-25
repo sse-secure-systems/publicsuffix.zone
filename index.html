@@ -73,6 +73,7 @@
     <h2>How it works</h2>
     <p class="lead">We created the DNS zone <samp>query.publicsuffix.zone</samp>. The public suffix for a <code>$DOMAIN</code> can be retrieved by querying the <samp>PTR</samp> record at <samp><code>$DOMAIN</code>.query.publicsuffix.zone</samp>. The PSL rules are encoded in the zone's records by means of crafty <samp>CNAME</samp> redirects and shrewd wildcard configurations, such that the DNS lookup eventually arrives at a <samp>PTR</samp> record which does indeed point to the public suffix of <code>$DOMAIN</code>.</p>
     <p class="lead">If <code>$DOMAIN</code> is subject to multiple PSL rules (e.g. it is covered by a wildcard, but an exception is defined), you will find <samp>TXT</samp> records alongside the <samp>PTR</samp> record, representing the PSL rules that were applied but overruled.</p>
+    <p class="lead">Please note that DNS resolvers learn about the domains that get queried, so depending on the use case, using this service may not be up to your privacy standards. In case you are interested in running a local copy of the PSL Query Service, please contact us via GitHub.</p>
 
     <h2>Libraries</h2>
     <p class="lead">Instead of querying the PSL zone yourself, you can use libraries to conveniently handle the lookup for you:</p>
