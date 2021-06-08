@@ -48,12 +48,23 @@
   <!-- Begin page content -->
   <div class="container">
     <div class="page-header">
+      <div style="background: #f8f8f8; border: 2px solid #efefef; border-radius: 4px; float: right; margin-bottom: 1em; margin-left: 1em; padding: 1.5em 1em 0.5em">
+        <form id="form">
+          <h2 style="font-size: 1.3em; margin-top: 0">Try it</h2>
+          <input id="domain" onfocus="this.select()" value="example.com"/>
+          <input type="submit" value="Query"/>
+        </form>
+	    <p id="result">Public suffix will be displayed here.</p>
+	    <p><small>This lookup uses the Google DoH resolver.</small></p>
+      </div>
       <h1>The PSL Query Service</h1>
     </div>
+
     <blockquote>
       <p>A "public suffix" is one under which Internet users can (or historically could) directly register names. Some examples of public suffixes are <samp>.com</samp>, <samp>.co.uk</samp> and <samp>pvt.k12.ma.us</samp>. The Public Suffix List is a list of all known public suffixes.</p>
       <footer><cite><a href="https://publicsuffix.org/">publicsuffix.org</a></cite></footer>
     </blockquote>
+
     <div style="background: #f8f8f8; border: 2px solid #efefef; border-radius: 4px; margin-bottom: 1em; padding: 1.5em 1em 0.5em">
       <p class="lead">The service at publicsuffix.zone allows querying the <a href="https://publicsuffix.org/">Public Suffix List</a> (PSL) conveniently via the DNS.
       <pre class="lead"><kbd>$ export DOMAIN=supertux.<b>github.io</b></kbd>
@@ -102,4 +113,20 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 	</body>
+
+    <script>
+document.getElementById("form").addEventListener('submit', async function handleForm(e) {
+    e.preventDefault();
+    var domain = document.getElementById("domain").value;
+    var response = await fetch(`https://dns.google/resolve?type=PTR&name=${domain}.query.publicsuffix.zone`);
+    if(response.status == 200) {
+		var json = await response.json();
+		var output = json.Answer.filter(rr => rr.type == 12)[0].data.slice(0,-1);
+	} else {
+		console.log(response);
+		var output = 'Invalid input. (Please use Punycode and no trailing dot.)';
+	}
+    document.getElementById("result").textContent = output;
+});
+    </script>
 </html>
