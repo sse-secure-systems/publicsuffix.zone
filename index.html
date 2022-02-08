@@ -92,11 +92,6 @@
       <li>Python: <a href="https://pypi.org/project/psl-dns/">psl-dns</a>, both library and command-line tools</li>
     </ul>
 
-    <h2>Limitations</h2>
-    <p class="lead">The PSL specification allows for inline wildcards. For example, <samp>public.*.tld</samp> would we a valid PSL rule, signifying that a third-level domain under <samp>tld</samp> whose third-level label is <samp>public</samp> is a public suffix, regardless of the second-level label. Unfortunately, such rules cannot be directly mapped onto the DNS, and any possible workarounds would require auxiliary DNS lookups. As a result, the desired information would not generally be determinable with just one query.</p>
-    <p class="lead">Luckily, the PSL currently does not contain any such pathologic cases as of now, so that this limitation currently is of no consequence. Libraries such as <a href="https://pypi.org/project/psl-dns/">psl-dns</a> handle these cases gracefully, should they ever occur.</p>
-    <p class="lead">Wildcards at the left-most position are supported (such as <samp>*.ck</samp>), including exception rules (such as <samp>www.ck</samp>).</p>
-
     <h2>Who runs this service?</h2>
     <p class="lead">The Public Suffix Query Service is provided for free. It is operated by <a href="https://securesystems.de/">SSE</a>, a Berlin-based IT security consultancy. SSE is invested in developing and promoting DNS-related (and other) security services for the public.</p>
     <p class="lead">The PSL zone <samp>query.publicsuffix.zone</samp> is hosted with <a href="https://desec.io/">deSEC</a>, a DNS hosting provider focusing on improving the security level of the DNS ecosystem.</p>
